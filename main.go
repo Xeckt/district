@@ -2,18 +2,15 @@ package main
 
 import (
 	"fmt"
+	"github.com/bwmarrin/discordgo"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
-
-	"github.com/bwmarrin/discordgo"
 )
 
 func main() {
-	Token := ""
-
-	dg, err := discordgo.New("Bot " + Token)
+	dg, err := discordgo.New("Bot " + config.Token)
 	if err != nil {
 		log.Fatalln("Failed to create Discord session:", err)
 		return
