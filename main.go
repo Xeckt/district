@@ -2,11 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/bwmarrin/discordgo"
 	"log"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/bwmarrin/discordgo"
 )
 
 func main() {
