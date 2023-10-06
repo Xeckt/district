@@ -1,13 +1,16 @@
 package main
 
 import (
+	"gopkg.in/yaml.v3"
 	"log"
 	"os"
-
-	"gopkg.in/yaml.v3"
 )
 
 type District struct {
+	Bot BotConfig `yaml:"district"`
+}
+
+type BotConfig struct {
 	Version     string `yaml:"version"`
 	Token       string `yaml:"token"`
 	EnableLog   bool   `yaml:"enableLog"`
@@ -15,7 +18,7 @@ type District struct {
 	LogDir      string `yaml:"logDir"`
 }
 
-var config District
+var Config District
 
 const configFile = "config.yml"
 
@@ -24,9 +27,9 @@ func init() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = yaml.Unmarshal(yml, &config)
+	err = yaml.Unmarshal(yml, &Config)
 	if err != nil {
 		log.Fatal(err)
 	}
-	config.Token = os.ExpandEnv(config.Token)
+	Config.Bot.Token = os.ExpandEnv(Config.Bot.Token)
 }
