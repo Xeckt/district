@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"log"
+	"go.uber.org/zap"
 	"os"
 	"os/signal"
 	"syscall"
@@ -13,7 +13,7 @@ import (
 func main() {
 	dg, err := discordgo.New("Bot " + config.Token)
 	if err != nil {
-		log.Fatalln("Failed to create Discord session:", err)
+		Dislog.Fatal(err.Error())
 		return
 	}
 
@@ -27,7 +27,7 @@ func main() {
 
 	err = dg.Open()
 	if err != nil {
-		fmt.Println("Failed to open Discord websocket:", err)
+		Dislog.Fatal(err.Error())
 		return
 	}
 
@@ -42,13 +42,13 @@ func main() {
 }
 
 func MemberJoined(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
-	fmt.Println("Member joined!")
+	Dislog.Info("Member joined guild", zap.String("member", m.Member.User.String()))
 }
 
 func MemberLeft(s *discordgo.Session, m *discordgo.GuildMemberRemove) {
-	fmt.Println("Member left!")
+	Dislog.Info("Member left guild", zap.String("member", m.Member.User.String()))
 }
 
 func MessageCreated(s *discordgo.Session, m *discordgo.MessageCreate) {
-	fmt.Println("Message created!")
+	Dislog.Info("Message created", zap.String("message", m.Content))
 }

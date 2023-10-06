@@ -8,10 +8,11 @@ import (
 )
 
 type District struct {
-	Version         string `yaml:"version"`
-	Token           string `yaml:"token"`
-	EnableDebugging bool   `yaml:"enableDebug"`
-	LogDir          string `yaml:"logDir"`
+	Version     string `yaml:"version"`
+	Token       string `yaml:"token"`
+	EnableLog   bool   `yaml:"enableLog"`
+	EnableDebug bool   `yaml:"enableDebug"`
+	LogDir      string `yaml:"logDir"`
 }
 
 var config District
