@@ -17,7 +17,7 @@ func init() {
 }
 
 func create() *zap.Logger {
-	err := os.MkdirAll(config.LogDir, os.ModePerm)
+	err := os.MkdirAll(Config.Bot.LogDir, os.ModePerm)
 	if err != nil {
 		log.Fatalln(err)
 	}
@@ -37,13 +37,13 @@ func create() *zap.Logger {
 	consoleEncoder := zapcore.NewConsoleEncoder(consoleConfig)
 	consoleLogLevel := zapcore.InfoLevel
 
-	logFile, _ := os.OpenFile(config.LogDir+"/"+mainLog, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	logFile, _ := os.OpenFile(Config.Bot.LogDir+"/"+mainLog, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	writer := zapcore.AddSync(logFile)
 
 	var core zapcore.Core
 
-	if !config.EnableLog {
-		if config.EnableDebug {
+	if !Config.Bot.EnableLog {
+		if Config.Bot.EnableDebug {
 			return zap.New(zapcore.NewCore(consoleEncoder, os.Stdout, consoleLogLevel),
 				zap.AddCaller(),
 				zap.AddStacktrace(zapcore.ErrorLevel),
@@ -62,7 +62,7 @@ func create() *zap.Logger {
 		zapcore.NewCore(consoleEncoder, os.Stdout, consoleLogLevel),
 	)
 
-	if config.EnableDebug {
+	if Config.Bot.EnableDebug {
 		return zap.New(core, zap.AddCaller(), zap.AddStacktrace(zap.DebugLevel))
 	}
 

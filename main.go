@@ -11,7 +11,11 @@ import (
 )
 
 func main() {
-	dg, err := discordgo.New("Bot " + config.Token)
+	if len(Config.Bot.Token) == 0 {
+		Dislog.Fatal("Token is empty!")
+		return
+	}
+	dg, err := discordgo.New("Bot " + Config.Bot.Token)
 	if err != nil {
 		Dislog.Fatal(err.Error())
 		return
