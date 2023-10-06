@@ -15,6 +15,7 @@ func main() {
 		Dislog.Fatal("Token is empty!")
 		return
 	}
+	
 	dg, err := discordgo.New("Bot " + Config.Bot.Token)
 	if err != nil {
 		Dislog.Fatal(err.Error())
