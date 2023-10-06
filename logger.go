@@ -3,6 +3,7 @@ package main
 import (
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"log"
 	"os"
 )
 
@@ -16,6 +17,11 @@ func init() {
 }
 
 func create() *zap.Logger {
+	err := os.MkdirAll(config.LogDir, os.ModePerm)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
 	consoleConfig := zapcore.EncoderConfig{
 		LevelKey:       "L",
 		NameKey:        "N",
@@ -59,6 +65,6 @@ func create() *zap.Logger {
 	if config.EnableDebug {
 		return zap.New(core, zap.AddCaller(), zap.AddStacktrace(zap.DebugLevel))
 	}
-	
+
 	return zap.New(core)
 }
