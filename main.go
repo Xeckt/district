@@ -11,9 +11,7 @@ import (
 )
 
 func main() {
-	Token := ""
-
-	dg, err := discordgo.New("Bot " + Token)
+	dg, err := discordgo.New("Bot " + config.Token)
 	if err != nil {
 		log.Fatalln("Failed to create Discord session:", err)
 		return
