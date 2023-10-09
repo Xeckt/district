@@ -1,70 +1,35 @@
 package main
 
 import (
-	"go.uber.org/zap"
-	"go.uber.org/zap/zapcore"
+	slogmulti "github.com/samber/slog-multi"
 	"log"
+	"log/slog"
 	"os"
 )
 
-var Dislog *zap.Logger
+var Dislog *slog.Logger
+var logFile *os.File
 
 const mainLog = "district.log"
 
 func init() {
 	Dislog = create()
-	defer Dislog.Sync()
 }
 
-func create() *zap.Logger {
+func create() *slog.Logger {
 	err := os.MkdirAll(Config.Bot.LogDir, os.ModePerm)
 	if err != nil {
 		log.Fatalln(err)
 	}
-
-	consoleConfig := zapcore.EncoderConfig{
-		LevelKey:       "L",
-		NameKey:        "N",
-		FunctionKey:    zapcore.OmitKey,
-		MessageKey:     "M",
-		LineEnding:     zapcore.DefaultLineEnding,
-		EncodeLevel:    zapcore.CapitalColorLevelEncoder,
-		EncodeTime:     zapcore.ISO8601TimeEncoder,
-		EncodeDuration: zapcore.StringDurationEncoder,
-		EncodeCaller:   zapcore.ShortCallerEncoder,
+	logFile, err = os.OpenFile(Config.Bot.LogDir+"/"+mainLog, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0755)
+	if err != nil {
+		log.Fatal(err)
 	}
-
-	consoleEncoder := zapcore.NewConsoleEncoder(consoleConfig)
-	consoleLogLevel := zapcore.InfoLevel
-
-	logFile, _ := os.OpenFile(Config.Bot.LogDir+"/"+mainLog, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	writer := zapcore.AddSync(logFile)
-
-	var core zapcore.Core
-
-	if !Config.Bot.EnableLog {
-		if Config.Bot.EnableDebug {
-			return zap.New(zapcore.NewCore(consoleEncoder, os.Stdout, consoleLogLevel),
-				zap.AddCaller(),
-				zap.AddStacktrace(zapcore.ErrorLevel),
-			)
-		}
-		return zap.New(zapcore.NewCore(consoleEncoder, os.Stdout, consoleLogLevel))
-	}
-
-	fileConfig := zap.NewProductionEncoderConfig()
-	fileConfig.EncodeTime = zapcore.ISO8601TimeEncoder
-	fileEncoder := zapcore.NewJSONEncoder(fileConfig)
-	fileLogLevel := zapcore.InfoLevel
-
-	core = zapcore.NewTee(
-		zapcore.NewCore(fileEncoder, writer, fileLogLevel),
-		zapcore.NewCore(consoleEncoder, os.Stdout, consoleLogLevel),
+	l := slog.New(
+		slogmulti.Fanout(
+			slog.NewJSONHandler(logFile, nil),
+			slog.NewTextHandler(os.Stdout, nil),
+		),
 	)
-
-	if Config.Bot.EnableDebug {
-		return zap.New(core, zap.AddCaller(), zap.AddStacktrace(zap.DebugLevel))
-	}
-
-	return zap.New(core)
+	return l
 }

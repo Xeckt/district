@@ -1,8 +1,8 @@
 package main
 
 import (
-	"fmt"
-	"go.uber.org/zap"
+	"log"
+	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
@@ -12,13 +12,14 @@ import (
 
 func main() {
 	if len(Config.Bot.Token) == 0 {
-		Dislog.Fatal("Token is empty!")
+		Dislog.Info("test?!?!?!?!?")
+		Dislog.Error("Token is empty!")
 		return
 	}
-	
+
 	dg, err := discordgo.New("Bot " + Config.Bot.Token)
 	if err != nil {
-		Dislog.Fatal(err.Error())
+		Dislog.Error(err.Error())
 		return
 	}
 
@@ -32,28 +33,36 @@ func main() {
 
 	err = dg.Open()
 	if err != nil {
-		Dislog.Fatal(err.Error())
+		Dislog.Error(err.Error())
 		return
 	}
 
 	// Wait here until CTRL-C or other term signal is received.
-	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
+	Dislog.Info("Bot is now running.  Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-sc
 
-	// Cleanly close down the Discord session.
-	dg.Close()
+	Dislog.Info("Shutting down District")
+	err = dg.Close()
+	if err != nil {
+		Dislog.Error(err.Error())
+	}
+	Dislog.Info("Closing log file.")
+	err = logFile.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func MemberJoined(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
-	Dislog.Info("Member joined guild", zap.String("member", m.Member.User.String()))
+	Dislog.Info("Member joined guild", slog.String("member", m.Member.User.String()))
 }
 
 func MemberLeft(s *discordgo.Session, m *discordgo.GuildMemberRemove) {
-	Dislog.Info("Member left guild", zap.String("member", m.Member.User.String()))
+	Dislog.Info("Member left guild", slog.String("member", m.Member.User.String()))
 }
 
 func MessageCreated(s *discordgo.Session, m *discordgo.MessageCreate) {
-	Dislog.Info("Message created", zap.String("message", m.Content))
+	Dislog.Info("Message created", slog.String("message", m.Content))
 }
