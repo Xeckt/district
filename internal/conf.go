@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	"gopkg.in/yaml.v3"
