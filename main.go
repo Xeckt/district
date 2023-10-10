@@ -3,32 +3,32 @@ package main
 import (
 	"fmt"
 	"log"
-	"log/slog"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 
 	"github.com/bwmarrin/discordgo"
 )
 
-func cleanup(s *discordgo.Session) {
-	Dislog.Info("Cleaning up")
-	go func() {
-		Dislog.Info("Shutting down district session")
-		err := s.Close()
-		if err != nil {
-			Dislog.Error("Error shutting down district", err)
-		}
-		Dislog.Info("Closing log file")
-		err = logFile.Close()
-		if err != nil {
-			log.Fatal(err)
-		}
-		fmt.Println("Done. Goodbye!")
-	}()
+func cleanup(s *discordgo.Session, wg *sync.WaitGroup) {
+	defer wg.Done()
+	Dislog.Info("Shutting down district session")
+	err := s.Close()
+	if err != nil {
+		Dislog.Error("Error shutting down district", err)
+	}
+	Dislog.Info("Closing log file")
+	err = logFile.Close()
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Done. Goodbye!")
 }
 
 func main() {
+	var wg sync.WaitGroup
+
 	if len(Config.Bot.Token) == 0 {
 		Dislog.Error("Token is empty!")
 		return
@@ -59,17 +59,7 @@ func main() {
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-sc
 
-	defer cleanup(dg)
-}
-
-func MemberJoined(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
-	Dislog.Info("Member joined guild", slog.String("member", m.Member.User.String()))
-}
-
-func MemberLeft(s *discordgo.Session, m *discordgo.GuildMemberRemove) {
-	Dislog.Info("Member left guild", slog.String("member", m.Member.User.String()))
-}
-
-func MessageCreated(s *discordgo.Session, m *discordgo.MessageCreate) {
-	Dislog.Info("Message created", slog.String("message", m.Content))
+	wg.Add(1)
+	go cleanup(dg, &wg)
+	wg.Wait()
 }
