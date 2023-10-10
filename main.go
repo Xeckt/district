@@ -28,11 +28,10 @@ func cleanup(s *discordgo.Session, wg *sync.WaitGroup) {
 
 func setupRequirements(s *discordgo.Session) {
 	dh := HandlerManager{Session: s}
-	im := IntentManager{Session: s}
 
 	AddMemberHandler(dh)
 	AddMessageHandler(dh)
-	AddIntents(im)
+	SpecifyIntents(dh)
 }
 
 func main() {
