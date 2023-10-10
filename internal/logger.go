@@ -1,4 +1,4 @@
-package main
+package internal
 
 import (
 	slogmulti "github.com/samber/slog-multi"
@@ -8,7 +8,7 @@ import (
 )
 
 var Dislog *slog.Logger
-var logFile *os.File
+var LogFile *os.File
 
 const mainLog = "district.log"
 
@@ -24,7 +24,7 @@ func create() *slog.Logger {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	logFile, err = os.OpenFile(Config.Bot.LogDir+"/"+mainLog, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0755)
+	LogFile, err = os.OpenFile(Config.Bot.LogDir+"/"+mainLog, os.O_RDWR|os.O_APPEND|os.O_CREATE, 0755)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -41,7 +41,7 @@ func create() *slog.Logger {
 	}
 	l = slog.New(
 		slogmulti.Fanout(
-			slog.NewJSONHandler(logFile, &hOpts),
+			slog.NewJSONHandler(LogFile, &hOpts),
 			slog.NewTextHandler(os.Stdout, &hOpts),
 		),
 	)
