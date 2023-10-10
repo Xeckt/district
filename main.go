@@ -1,6 +1,7 @@
 package main
 
 import (
+	"district/internal"
 	"fmt"
 	"log"
 	"os"
@@ -13,48 +14,51 @@ import (
 
 func cleanup(s *discordgo.Session, wg *sync.WaitGroup) {
 	defer wg.Done()
-	Dislog.Info("Shutting down district session")
+	internal.Dislog.Info("Shutting down district session")
 	err := s.Close()
 	if err != nil {
-		Dislog.Error("Error shutting down district", err)
+		internal.Dislog.Error("Error shutting down district", err)
 	}
-	Dislog.Info("Closing log file")
-	err = logFile.Close()
+	internal.Dislog.Info("Closing log file")
+	err = internal.LogFile.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println("Done. Goodbye!")
 }
 
+func setupRequirements(s *discordgo.Session) {
+	dh := internal.HandlerManager{Session: s}
+	im := internal.IntentManager{Session: s}
+
+	internal.AddMemberHandler(dh)
+	internal.AddMessageHandler(dh)
+	internal.AddIntents(im)
+}
+
 func main() {
 	var wg sync.WaitGroup
 
-	if len(Config.Bot.Token) == 0 {
-		Dislog.Error("Token is empty!")
+	if len(internal.Config.Bot.Token) == 0 {
+		internal.Dislog.Error("Token is empty!")
 		return
 	}
 
-	dg, err := discordgo.New("Bot " + Config.Bot.Token)
+	dg, err := discordgo.New("Bot " + internal.Config.Bot.Token)
 	if err != nil {
-		Dislog.Error("Could not create session with district", err)
+		internal.Dislog.Error("Could not create session with district", err)
 		return
 	}
-
-	dg.AddHandler(MemberJoined)
-	dg.AddHandler(MemberLeft)
-	dg.AddHandler(MessageCreated)
-
-	dg.Identify.Intents |= discordgo.IntentsGuilds
-	dg.Identify.Intents |= discordgo.IntentsGuildMembers
-	dg.Identify.Intents |= discordgo.IntentsGuildMessages
 
 	err = dg.Open()
 	if err != nil {
-		Dislog.Error("Error opening district session", err)
+		internal.Dislog.Error("Error opening district session", err)
 		return
 	}
 
-	Dislog.Info("Bot is now running. Press CTRL-C to exit.")
+	setupRequirements(dg)
+
+	internal.Dislog.Info("district is now running. CTRL+C to exit.")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-sc
