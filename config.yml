@@ -1,6 +1,6 @@
 district:
   version: 0.0.1
   token: $DISTRICT_TOKEN
-  enableLog: True
+  enableLogFile: True
   enableDebug: True
   logDir: "./logs"
