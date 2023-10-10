@@ -28,11 +28,3 @@ func (hm HandlerManager) AddIntents(intents ...discordgo.Intent) {
 		hm.Identify.Intents |= i
 	}
 }
-
-func SpecifyIntents(im HandlerManager) {
-	im.AddIntents(
-		discordgo.IntentsGuilds,
-		discordgo.IntentsGuildMembers,
-		discordgo.IntentsGuildMessages,
-	)
-}
