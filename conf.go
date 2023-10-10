@@ -11,11 +11,11 @@ type District struct {
 }
 
 type BotConfig struct {
-	Version     string `yaml:"version"`
-	Token       string `yaml:"token"`
-	EnableLog   bool   `yaml:"enableLog"`
-	EnableDebug bool   `yaml:"enableDebug"`
-	LogDir      string `yaml:"logDir"`
+	Version       string `yaml:"version"`
+	Token         string `yaml:"token"`
+	EnableLogFile bool   `yaml:"enableLogFile"`
+	EnableDebug   bool   `yaml:"enableDebug"`
+	LogDir        string `yaml:"logDir"`
 }
 
 var Config District
