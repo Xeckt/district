@@ -1,2 +1,6 @@
-version: 0.0.1
-token: $DISTRICT_TOKEN
+district:
+  version: 0.0.1
+  token: $DISTRICT_TOKEN
+  enableLogFile: True
+  enableDebug: True
+  logDir: "./logs"
