@@ -1,7 +1,6 @@
 package main
 
 import (
-	"district/internal"
 	"fmt"
 	"log"
 	"os"
@@ -14,13 +13,13 @@ import (
 
 func cleanup(s *discordgo.Session, wg *sync.WaitGroup) {
 	defer wg.Done()
-	internal.Dislog.Info("Shutting down district session")
+	Dislog.Info("Shutting down district session")
 	err := s.Close()
 	if err != nil {
-		internal.Dislog.Error("Error shutting down district", err)
+		Dislog.Error("Error shutting down district", err)
 	}
-	internal.Dislog.Info("Closing log file")
-	err = internal.LogFile.Close()
+	Dislog.Info("Closing log file")
+	err = LogFile.Close()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -28,37 +27,37 @@ func cleanup(s *discordgo.Session, wg *sync.WaitGroup) {
 }
 
 func setupRequirements(s *discordgo.Session) {
-	dh := internal.HandlerManager{Session: s}
-	im := internal.IntentManager{Session: s}
+	dh := HandlerManager{Session: s}
+	im := IntentManager{Session: s}
 
-	internal.AddMemberHandler(dh)
-	internal.AddMessageHandler(dh)
-	internal.AddIntents(im)
+	AddMemberHandler(dh)
+	AddMessageHandler(dh)
+	AddIntents(im)
 }
 
 func main() {
 	var wg sync.WaitGroup
 
-	if len(internal.Config.Bot.Token) == 0 {
-		internal.Dislog.Error("Token is empty!")
+	if len(Config.Bot.Token) == 0 {
+		Dislog.Error("Token is empty!")
 		return
 	}
 
-	dg, err := discordgo.New("Bot " + internal.Config.Bot.Token)
+	dg, err := discordgo.New("Bot " + Config.Bot.Token)
 	if err != nil {
-		internal.Dislog.Error("Could not create session with district", err)
+		Dislog.Error("Could not create session with district", err)
 		return
 	}
 
 	err = dg.Open()
 	if err != nil {
-		internal.Dislog.Error("Error opening district session", err)
+		Dislog.Error("Error opening district session", err)
 		return
 	}
 
 	setupRequirements(dg)
 
-	internal.Dislog.Info("district is now running. CTRL+C to exit.")
+	Dislog.Info("district is now running. CTRL+C to exit.")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-sc

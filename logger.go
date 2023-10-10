@@ -1,4 +1,4 @@
-package internal
+package main
 
 import (
 	slogmulti "github.com/samber/slog-multi"
