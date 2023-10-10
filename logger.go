@@ -35,7 +35,7 @@ func create() *slog.Logger {
 			ReplaceAttr: nil,
 		}
 	}
-	if Config.Bot.EnableLogFile {
+	if !Config.Bot.EnableLogFile {
 		l = slog.New(slog.NewTextHandler(os.Stdout, &hOpts))
 		return l
 	}
