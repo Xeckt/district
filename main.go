@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"log"
+	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
@@ -10,10 +11,32 @@ import (
 	"github.com/bwmarrin/discordgo"
 )
 
+func cleanup(s *discordgo.Session) {
+	Dislog.Info("Cleaning up")
+	go func() {
+		Dislog.Info("Shutting down district session")
+		err := s.Close()
+		if err != nil {
+			Dislog.Error("Error shutting down district", err)
+		}
+		Dislog.Info("Closing log file")
+		err = logFile.Close()
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println("Done. Goodbye!")
+	}()
+}
+
 func main() {
-	dg, err := discordgo.New("Bot " + config.Token)
+	if len(Config.Bot.Token) == 0 {
+		Dislog.Error("Token is empty!")
+		return
+	}
+
+	dg, err := discordgo.New("Bot " + Config.Bot.Token)
 	if err != nil {
-		log.Fatalln("Failed to create Discord session:", err)
+		Dislog.Error("Could not create session with district", err)
 		return
 	}
 
@@ -27,28 +50,26 @@ func main() {
 
 	err = dg.Open()
 	if err != nil {
-		fmt.Println("Failed to open Discord websocket:", err)
+		Dislog.Error("Error opening district session", err)
 		return
 	}
 
-	// Wait here until CTRL-C or other term signal is received.
-	fmt.Println("Bot is now running.  Press CTRL-C to exit.")
+	Dislog.Info("Bot is now running. Press CTRL-C to exit.")
 	sc := make(chan os.Signal, 1)
 	signal.Notify(sc, syscall.SIGINT, syscall.SIGTERM, os.Interrupt)
 	<-sc
 
-	// Cleanly close down the Discord session.
-	dg.Close()
+	defer cleanup(dg)
 }
 
 func MemberJoined(s *discordgo.Session, m *discordgo.GuildMemberAdd) {
-	fmt.Println("Member joined!")
+	Dislog.Info("Member joined guild", slog.String("member", m.Member.User.String()))
 }
 
 func MemberLeft(s *discordgo.Session, m *discordgo.GuildMemberRemove) {
-	fmt.Println("Member left!")
+	Dislog.Info("Member left guild", slog.String("member", m.Member.User.String()))
 }
 
 func MessageCreated(s *discordgo.Session, m *discordgo.MessageCreate) {
-	fmt.Println("Message created!")
+	Dislog.Info("Message created", slog.String("message", m.Content))
 }

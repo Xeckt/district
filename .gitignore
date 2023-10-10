@@ -22,3 +22,6 @@ go.work
 
 # IntelliJ
 .idea
+
+# Dev logging folder
+logs
