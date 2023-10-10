@@ -17,6 +17,9 @@ func init() {
 }
 
 func create() *slog.Logger {
+	var hOpts slog.HandlerOptions
+	var l *slog.Logger
+
 	err := os.MkdirAll(Config.Bot.LogDir, os.ModePerm)
 	if err != nil {
 		log.Fatalln(err)
@@ -25,10 +28,21 @@ func create() *slog.Logger {
 	if err != nil {
 		log.Fatal(err)
 	}
-	l := slog.New(
+	if Config.Bot.EnableDebug {
+		hOpts = slog.HandlerOptions{
+			AddSource:   true,
+			Level:       slog.LevelDebug,
+			ReplaceAttr: nil,
+		}
+	}
+	if Config.Bot.EnableLogFile {
+		l = slog.New(slog.NewTextHandler(os.Stdout, &hOpts))
+		return l
+	}
+	l = slog.New(
 		slogmulti.Fanout(
-			slog.NewJSONHandler(logFile, nil),
-			slog.NewTextHandler(os.Stdout, nil),
+			slog.NewJSONHandler(logFile, &hOpts),
+			slog.NewTextHandler(os.Stdout, &hOpts),
 		),
 	)
 	return l
