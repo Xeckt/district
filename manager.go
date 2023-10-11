@@ -19,12 +19,21 @@ type HandlerManager struct {
 func (hm HandlerManager) AddHandlers(handlers ...any) {
 	for _, h := range handlers {
 		hm.AddHandler(h)
-		Dislog.Info("Handler added", slog.String("Handler", runtime.FuncForPC(reflect.ValueOf(h).Pointer()).Name()))
+		Dislog.With(
+			slog.Group("handler",
+				slog.String("name", runtime.FuncForPC(reflect.ValueOf(h).Pointer()).Name()),
+			),
+		).Info("Handler added")
 	}
 }
 
 func (hm HandlerManager) AddIntents(intents ...discordgo.Intent) {
 	for _, i := range intents {
 		hm.Identify.Intents |= i
+		Dislog.With(
+			slog.Group("intent",
+				slog.String("name", IntentString(i)),
+			),
+		).Info("intent specified")
 	}
 }
