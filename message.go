@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/bwmarrin/discordgo"
 	"log/slog"
+
+	"github.com/bwmarrin/discordgo"
 )
 
 func MessageCreated(s *discordgo.Session, m *discordgo.MessageCreate) {

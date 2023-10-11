@@ -1,20 +1,23 @@
 package main
 
 import (
-	slogmulti "github.com/samber/slog-multi"
 	"log"
 	"log/slog"
 	"os"
+
+	slogmulti "github.com/samber/slog-multi"
 )
 
 var Dislog *slog.Logger
 var LogFile *os.File
 
-const mainLog = "district.log"
-
 func init() {
 	Dislog = create()
 }
+
+const (
+	mainLog = "district.log"
+)
 
 func create() *slog.Logger {
 	var hOpts slog.HandlerOptions

@@ -1,10 +1,11 @@
 package main
 
 import (
-	"github.com/bwmarrin/discordgo"
 	"log/slog"
 	"reflect"
 	"runtime"
+
+	"github.com/bwmarrin/discordgo"
 )
 
 type DistrictHandler interface {
