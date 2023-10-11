@@ -45,7 +45,6 @@ func IntentString(i discordgo.Intent) string {
 	default:
 		return "No string found for this intent"
 	}
-	return "None found"
 }
 
 func SpecifyIntents(im HandlerManager) {
